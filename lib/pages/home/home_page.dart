@@ -283,7 +283,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             onPressed: () => Scaffold.of(context).openDrawer(),
           ),
         ),
-        title: const Text('Nullgram'),
+        title: const Text('ZapZap'),
         actions: [
           IconButton(
             icon: const Icon(Icons.search),
