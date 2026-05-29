@@ -11,7 +11,7 @@ android {
         }
     }
 
-    namespace = "org.nullgram"
+    namespace = "com.zapzap"
     compileSdk = 35
     ndkVersion = "27.0.12077973"
 
@@ -25,7 +25,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "org.nullgram"
+        applicationId = "com.zapzap"
         minSdk = 23
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
