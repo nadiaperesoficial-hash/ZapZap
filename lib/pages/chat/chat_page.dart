@@ -162,54 +162,45 @@ class _ChatPageState extends State<ChatPage> {
   Future<void> startAudioRecording() async {
     if (await _record.hasPermission()) {
       _isRecording.value = true;
-
       final dir = await getTemporaryDirectory();
-
       await _record.start(
-        const RecordConfig(
-          encoder: AudioEncoder.opus,
-          bitRate: 96000,
-        ),
+        const RecordConfig(encoder: AudioEncoder.opus, bitRate: 96000),
         path: '${dir.path}/audio_${DateTime.now().millisecondsSinceEpoch}.ogg',
       );
     }
   }
+
   Future<void> stopAudioRecording() async {
     final chatId = widget.chat['id'];
     final path = await _record.stop();
-
     _isRecording.value = false;
-
     await TDLibClient.sendAudio(chatId: chatId, path: path!);
   }
 
-  // TODO: Implement video recording methods
   Future<void> startVideoRecording() async {}
   Future<void> stopVideoRecording() async {}
 
+  Future<void> _sendMessage() async {
+    final text = _messageController.text.trim();
+    if (text.isEmpty) return;
+    _messageController.clear();
+    _messageText.value = '';
+    await TDLibClient.sendMessage(chatId: widget.chat['id'], text: text);
+  }
+
   Widget _buildMessageInput() {
     final canSendBasicMessages = widget.chat['permissions']?['canSendBasicMessages'] ?? true;
-
-    if (!canSendBasicMessages) {
-      return const SizedBox.shrink();
-    }
+    if (!canSendBasicMessages) return const SizedBox.shrink();
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
-        border: Border(
-          top: BorderSide(
-            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
-          ),
-        ),
+        border: Border(top: BorderSide(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1))),
       ),
       child: Row(
         children: [
-          IconButton(
-            icon: const Icon(Icons.emoji_emotions_outlined),
-            onPressed: () {},
-          ),
+          IconButton(icon: const Icon(Icons.emoji_emotions_outlined), onPressed: () {}),
           Expanded(
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -236,58 +227,41 @@ class _ChatPageState extends State<ChatPage> {
                   const SizedBox(width: 8),
                   InkWell(
                     onTap: () {},
-                    borderRadius: BorderRadius.circular(16),
-                    child: const Padding(
-                      padding: EdgeInsets.all(4),
-                      child: Icon(Icons.attach_file, size: 22),
-                    ),
+                    child: const Icon(Icons.attach_file, size: 22),
                   ),
                 ],
               ),
             ),
           ),
           const SizedBox(width: 4),
-          ValueListenableBuilder<bool>(
-            valueListenable: _isAudioMode,
-            builder: (context, isAudioMode, child) {
+          ValueListenableBuilder<String>(
+            valueListenable: _messageText,
+            builder: (context, text, child) {
+              if (text.trim().isNotEmpty) {
+                return IconButton(
+                  icon: const Icon(Icons.send, color: Colors.blue),
+                  onPressed: _sendMessage,
+                );
+              }
               return ValueListenableBuilder<bool>(
-                valueListenable: _isRecording,
-                builder: (context, isRecording, child) {
-                  return GestureDetector(
-                    onTap: () {
-                      if (_isAudioMode.value && _isRecording.value) {
-                        stopAudioRecording();
-                        return;
-                      } else if (!_isAudioMode.value && _isRecording.value) {
-                        stopVideoRecording();
-                        return;
-                      }
-
-                      _isAudioMode.value = !isAudioMode;
-                    },
-                    onLongPressStart: (_) async {
-                      if (isAudioMode) {
-                        await startAudioRecording();
-                      } else {
-                        await startVideoRecording();
-                      }
-                    },
-                    child: Container(
-                      width: 48,
-                      height: 48,
-                      decoration: BoxDecoration(
-                        color: isRecording ? Colors.red : Theme.of(context).colorScheme.primary,
-                        shape: BoxShape.circle,
-                      ),
-                      child: Center(
-                        child: Icon(
-                          isAudioMode
-                              ? (isRecording ? Icons.mic : Icons.mic_none)
-                              : Icons.videocam,
-                          color: Colors.white,
+                valueListenable: _isAudioMode,
+                builder: (context, isAudioMode, child) {
+                  return ValueListenableBuilder<bool>(
+                    valueListenable: _isRecording,
+                    builder: (context, isRecording, child) {
+                      return GestureDetector(
+                        onTap: () => _isAudioMode.value = !isAudioMode,
+                        onLongPressStart: (_) => isAudioMode ? startAudioRecording() : startVideoRecording(),
+                        onLongPressEnd: (_) => isRecording ? (isAudioMode ? stopAudioRecording() : stopVideoRecording()) : null,
+                        child: Container(
+                          width: 48, height: 48,
+                          decoration: BoxDecoration(color: isRecording ? Colors.red : Theme.of(context).colorScheme.primary, shape: BoxShape.circle),
+                          child: Center(
+                            child: Icon(isAudioMode ? (isRecording ? Icons.mic : Icons.mic_none) : Icons.videocam, color: Colors.white),
+                          ),
                         ),
-                      ),
-                    ),
+                      );
+                    },
                   );
                 },
               );
@@ -302,131 +276,44 @@ class _ChatPageState extends State<ChatPage> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onHorizontalDragEnd: (details) {
-        const double minSwipeVelocity = 300.0;
-        if (details.primaryVelocity != null && 
-            details.primaryVelocity! > minSwipeVelocity) {
-          Navigator.of(context).pop();
-        }
+        if (details.primaryVelocity != null && details.primaryVelocity! > 300) Navigator.of(context).pop();
       },
       child: Scaffold(
-      appBar: AppBar(
-        titleSpacing: 0,
-        title: InkWell(
-          onTap: () {},
-          child: Row(
+        appBar: AppBar(
+          titleSpacing: 0,
+          title: Row(
             children: [
               ChatAvatar(chat: widget.chat, radius: 20),
               const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      widget.chat['title'] ?? 'Chat',
-                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    if (widget.chat['user'] != null)
-                      Text(
-                        MessageFormatter.getUserStatus(widget.chat['user']!),
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
-                        ),
-                      ),
-                    if (widget.chat['supergroup'] != null)
-                      Text(
-                        "${NumberFormat('#,###', 'en_US').format(widget.chat['supergroup']['memberCount'] ?? 0)} subscribers",
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
-                        ),
-                      ),
-                  ],
-                ),
-              ),
+              Text(widget.chat['title'] ?? 'Chat'),
             ],
           ),
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.call),
-            onPressed: () {},
-          ),
-          IconButton(
-            icon: const Icon(Icons.more_vert),
-            onPressed: () {},
-          ),
-        ],
-      ),
-      body: Column(
-        children: [
-          Expanded(
-            child: ValueListenableBuilder(
-              valueListenable: _messages,
-              builder: (context, messages, child) {
-                return ValueListenableBuilder<bool>(
-                  valueListenable: _isLoading,
-                  builder: (context, isLoading, child) {
-                    if (messages.isEmpty && !isLoading) {
-                      return const Center(child: Text('No messages yet'));
-                    }
-
-                    return ListView.builder(
-                      controller: _scrollController,
-                      reverse: true,
-                      itemCount: messages.length + (isLoading ? 1 : 0),
-                      itemBuilder: (context, index) {
-                        if (isLoading && index == messages.length) {
-                          return const Padding(
-                            padding: EdgeInsets.all(16),
-                            child: Center(
-                              child: Text(
-                                'Loading older messages',
-                                style: TextStyle(color: Colors.grey),
-                              ),
-                            ),
-                          );
-                        }
-
-                        if (messages.isEmpty) {
-                          return const SizedBox.shrink();
-                        }
-
-                        final messageIndex = index;
-                        final message = messages[messageIndex];
-
-                        final triggerIndex = 50;
-                        final isNearEnd = messageIndex >= messages.length - triggerIndex;
-
-                        if (isNearEnd && !isLoading && _hasMore.value) {
-                          WidgetsBinding.instance.addPostFrameCallback((_) {
-                            _loadBatch();
-                          });
-                        }
-
-                        if (message['isAlbum'] == true) {
-                          return AlbumBubble(
-                            albumMessages: message['messages'],
-                            chat: widget.chat,
-                          );
-                        }
-
-                        return MessageBubble(
-                          message: message,
-                          chat: widget.chat,
-                        );
-                      },
-                    );
-                  },
-                );
-              },
+        body: Column(
+          children: [
+            Expanded(
+              child: ValueListenableBuilder(
+                valueListenable: _messages,
+                builder: (context, messages, child) {
+                  return ListView.builder(
+                    controller: _scrollController,
+                    reverse: true,
+                    itemCount: messages.length,
+                    itemBuilder: (context, index) {
+                      final message = messages[index];
+                      if (message['isAlbum'] == true) {
+                        return AlbumBubble(albumMessages: message['messages'], chat: widget.chat);
+                      }
+                      return MessageBubble(message: message, chat: widget.chat);
+                    },
+                  );
+                },
+              ),
             ),
-          ),
-          _buildMessageInput(),
-        ],
+            _buildMessageInput(),
+          ],
+        ),
       ),
-    ));
+    );
   }
 }
