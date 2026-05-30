@@ -8,42 +8,65 @@ class LanguageSettingsPage extends StatefulWidget {
 }
 
 class _LanguageSettingsPageState extends State<LanguageSettingsPage> {
-  // Lista de idiomas suportados (simulando a estrutura do Telegram)
+  // Lista de idiomas suportados
   final List<Map<String, String>> languages = [
     {'name': 'English', 'native': 'English', 'code': 'en'},
     {'name': 'Portuguese', 'native': 'Português (Brasil)', 'code': 'pt-br'},
     {'name': 'Spanish', 'native': 'Español', 'code': 'es'},
-    {'name': 'Russian', 'native': 'Русский', 'code': 'ru'},
+    {'name': 'French', 'native': 'Français', 'code': 'fr'},
+    {'name': 'German', 'native': 'Deutsch', 'code': 'de'},
+    {'name': 'Italian', 'native': 'Italiano', 'code': 'it'},
   ];
 
-  String selectedCode = 'en'; // Código padrão
+  String _selectedCode = 'en'; // Idioma padrão
+
+  @override
+  void initState() {
+    super.initState();
+    // Aqui você pode carregar o idioma atual salvo no dispositivo/TDLib
+    // _loadCurrentLanguage();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Language'),
+        elevation: 0,
       ),
-      body: ListView.builder(
+      body: ListView.separated(
         itemCount: languages.length,
+        separatorBuilder: (context, index) => const Divider(height: 1),
         itemBuilder: (context, index) {
           final lang = languages[index];
+          final isSelected = _selectedCode == lang['code'];
+
           return ListTile(
-            title: Text(lang['name']!),
+            title: Text(
+              lang['name']!,
+              style: TextStyle(
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+              ),
+            ),
             subtitle: Text(lang['native']!),
-            trailing: selectedCode == lang['code']
-                ? const Icon(Icons.check, color: Colors.blue)
+            trailing: isSelected
+                ? Icon(Icons.check, color: Theme.of(context).colorScheme.primary)
                 : null,
             onTap: () {
               setState(() {
-                selectedCode = lang['code']!;
+                _selectedCode = lang['code']!;
               });
-              // AQUI VOCÊ CHAMARIA O TDLib PARA MUDAR O IDIOMA
-              // Ex: TDLibClient.setOption(name: "language_pack_id", value: selectedCode);
+
+              // IMPLEMENTAÇÃO TDLib:
+              // Aqui você enviaria a atualização para o TDLib
+              // TDLibClient.setOption(name: "language_pack_id", value: _selectedCode);
               
-              // Feedback visual
+              // Feedback visual rápido
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Language changed to ${lang['name']}')),
+                SnackBar(
+                  content: Text('Idioma alterado para ${lang['name']}'),
+                  duration: const Duration(seconds: 1),
+                ),
               );
             },
           );
@@ -52,4 +75,3 @@ class _LanguageSettingsPageState extends State<LanguageSettingsPage> {
     );
   }
 }
-a
