@@ -20,6 +20,15 @@ jobs:
         with:
           flutter-version-file: pubspec.yaml
 
+      - name: Setup icons
+        run: |
+          mkdir -p android/app/src/main/res/mipmap-hdpi
+          cp android/app/src/main/res/ic_launcher.png android/app/src/main/res/mipmap-hdpi/ic_launcher.png
+          cp android/app/src/main/res/ic_launcher.png android/app/src/main/res/mipmap-mdpi/ic_launcher.png
+          cp android/app/src/main/res/ic_launcher.png android/app/src/main/res/mipmap-xhdpi/ic_launcher.png
+          cp android/app/src/main/res/ic_launcher.png android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png
+          cp android/app/src/main/res/ic_launcher.png android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
+
       - name: Install dependencies
         run: flutter pub get
 
