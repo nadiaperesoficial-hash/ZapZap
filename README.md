@@ -23,7 +23,7 @@ where the focus is on **simplicity, and functionality** - not monetization.
 - Fast and lightweight
 - Uses official Telegram APIs
 - Focused on functionalities and UI responsiveness
-
+- Now fix send message!! ✔️
 ---
 
 ## 📝 TODO
@@ -45,23 +45,9 @@ where the focus is on **simplicity, and functionality** - not monetization.
 
 ## 🧩 Installation
 
-1. Clone the repository
-   ```bash
-   git clone https://github.com/dima-xd/nullgram.git
-   cd nullgram
-   ```   
 
-2. Open the `.env` file and fill in your values
 
-3. Get dependencies
-   ```bash
-   flutter pub get
-   ```
 
-4. Run the app
-   ```bash
-   flutter run
-    ```
 
 ---
 
