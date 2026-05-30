@@ -1,9 +1,9 @@
-# Nullgram
+# ZapZap
 
-**Nullgram** is a fully custom Telegram client built **from scratch in Flutter**, without any of the messy original Telegram code.  
-The goal is to create a clean, modern, and performant alternative to the official app.
+**ZapZap** is a fully custom Telegram client built **from scratch in Flutter**, without any of the messy original Telegram code.  
+The goal is to create a clean, modern, and performant alternative to the official app for brazilian users
 
-Currently, Nullgram is being developed **only for Android**.  
+Currently,  is being developed **only for Android**.  
 If the author ever gets an iPhone - iOS support *might* become a thing too.
 
 ---
