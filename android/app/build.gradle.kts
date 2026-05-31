@@ -32,20 +32,6 @@ android {
         versionName = flutter.versionName
     }
 
-    signingConfigs {
-        val keystore = System.getenv("ANDROID_KEYSTORE")
-        if (keystore != null) {
-            create("release") {
-                storeFile = file(keystore)
-                storePassword = System.getenv("KEYSTORE_PASSWORD")
-                keyAlias = System.getenv("KEYSTORE_ALIAS")
-                keyPassword = System.getenv("KEY_PASSWORD")
-            }
-        } else {
-            create("release") {}
-        }
-    }
-
     buildTypes {
         release {
             isMinifyEnabled = true
@@ -54,10 +40,9 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            signingConfig = signingConfigs.getByName("release")
+            signingConfig = signingConfigs.getByName("debug")
         }
         debug {
-            applicationIdSuffix = ".debug"
             isMinifyEnabled = false
             isShrinkResources = false
         }
