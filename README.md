@@ -1,4 +1,4 @@
-# ZapZap
+# ZapZap Um aplicativo brasileiro 
 
 **ZapZap** is a fully custom Telegram client built **from scratch in Flutter**, without any of the messy original Telegram code.  
 The goal is to create a clean, modern, and performant alternative to the official app for brazilian users
@@ -13,7 +13,7 @@ If the author ever gets an iPhone - iOS support *might* become a thing too.
 The author doesn’t like what Telegram has become -  
 bloated with **ads**, **Telegram Premium**, and all the **NFT-style scam nonsense**.
 
-So instead of complaining, Nullgram is being built as a **clean and free alternative**,  
+So instead of complaining, ZapZap is being built as a **clean and free alternative**,  
 where the focus is on **simplicity, and functionality** - not monetization.
 
 ---
