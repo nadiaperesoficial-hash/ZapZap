@@ -24,6 +24,8 @@ where the focus is on **simplicity, and functionality** - not monetization.
 - Uses official Telegram APIs
 - Focused on functionalities and UI responsiveness
 - Now fix send message!! ✔️
+- Now page ZapStory
+- language option 
 ---
 
 ## 📝 TODO
