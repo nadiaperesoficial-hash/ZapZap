@@ -1,0 +1,58 @@
+name: Update TDLib
+
+on:
+  workflow_dispatch:
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout ZapZap
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install Git LFS
+        run: |
+          sudo apt-get install -y git-lfs
+          git lfs install
+
+      - name: Clone TGX TDLib (with LFS)
+        run: |
+          git clone --depth=1 https://github.com/TGX-Android/tdlib.git tgx_tdlib
+          cd tgx_tdlib
+          git lfs pull
+
+      - name: Copy libtdjni.so files
+        run: |
+          for arch in arm64-v8a armeabi-v7a x86_64; do
+            src="tgx_tdlib/src/main/libs/${arch}/libtdjni.so"
+            dst="android/app/src/main/jniLibs/${arch}/libtdjni.so"
+            if [ -f "$src" ]; then
+              echo "Copying $arch..."
+              cp "$src" "$dst"
+            else
+              echo "Not found: $src"
+            fi
+          done
+          # x86 -> x86_64 fallback
+          src="tgx_tdlib/src/main/libs/x86_64/libtdjni.so"
+          dst="android/app/src/main/jniLibs/x86_64/libtdjni.so"
+          if [ -f "$src" ]; then
+            cp "$src" "$dst"
+          fi
+
+      - name: Show file sizes
+        run: |
+          find android/app/src/main/jniLibs -name "*.so" -exec ls -lh {} \;
+
+      - name: Commit updated TDLib
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add android/app/src/main/jniLibs/
+          git diff --staged --quiet || git commit -m "Update libtdjni.so from TGX-Android/tdlib"
+          git push
