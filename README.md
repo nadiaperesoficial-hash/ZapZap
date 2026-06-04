@@ -19,6 +19,21 @@ where the focus is on **simplicity, and functionality** - not monetization.
 ---
 
 ## 🚀 Features (in progress)
+
+-new video message note
+
+Como funciona:
+Envio:
+*Grava vídeo circular pela câmera (máx 60s)
+Upload para via Cloudinary
+(video_notes)
+
+Busca no Supabase — verifica se expirou
+Aparece como círculo preto com ícone play
+*Ao tocar → carrega e reproduz o vídeo
+Some imediatamente após terminar
+*Se não assistir em 1 hora → some automaticamente
+
 - Built with Flutter
 - Fast and lightweight
 - Uses official Telegram APIs
